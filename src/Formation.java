@@ -13,9 +13,7 @@ public class Formation {
 	public static final Scanner scanner = new Scanner(System.in);
 
 	public static void main(String[] args) {
-
 		System.out.println("Bonjour et bienvenue dans l'application FullTraining");
-		System.out.println();
 		HashMap<Integer, ArrayList<String>> training = List.training(); // récup la liste des formations
 		HashMap<Integer, ArrayList<String>> cart = new HashMap<Integer, ArrayList<String>>(); // panier de l'utilisateur
 
@@ -46,6 +44,14 @@ public class Formation {
 				System.out.println("4 - Quitter l'application");
 				displayChoice = true;
 				break;
+//			case 5:
+//				System.out.println("5 - Supprimer pour tester");
+//				int id = scanner.nextInt();
+//				if (training.get(id) != null) { // si formation existe
+//					cart.remove(id); // ajout au panier
+//				}
+//				displayChoice = true;
+//				break;
 			}
 		} while (displayChoice);
 		scanner.close();
@@ -85,6 +91,7 @@ public class Formation {
 		System.out.println("2 - Ajouter une formation au panier");
 		System.out.println("3 - Afficher votre panier");
 		System.out.println("4 - Quitter l'application");
+		System.out.println("5 - Supprimer pour tester");
 	}
 
 	/**
@@ -95,14 +102,20 @@ public class Formation {
 	 */
 	public static void commande(HashMap<Integer, ArrayList<String>> training,
 			HashMap<Integer, ArrayList<String>> cart) {
-		System.out.println("Quelle formation souhaitez-vous acheter ? [Saisir l'ID de la formation]");
-		int id = scanner.nextInt();// récup le choix de l'user
-		int cartId = cart.size() + 1; // permet de créer un ID unique pour chaque commande
-		if (training.get(id) != null) { // si formation existe
-			cart.put(cartId, training.get(id)); // ajout au panier
+		displayTraining(training);
+		System.out.println("Souhaitez-vous ajouter une formation à votre panier ? [Oui/Non]");
+		String str = scanner.next();
+//		int key = 1;
+		while(str.equalsIgnoreCase("oui") || str.equalsIgnoreCase("o")) {
+			System.out.println("Quelle formation souhaitez-vous acheter ? [Saisir l'ID de la formation]");
+			int id = scanner.nextInt();// récup le choix de l'user
+			int key = cart.size() + 1; // permet de créer un ID unique pour chaque commande
+			if (training.get(id) != null) { // si formation existe
+				cart.put(key, training.get(id)); // ajout au panier
+			}
+			System.out.println("Souhaitez-vous ajouter une autre formation ? [Oui/Non]");
+			str = scanner.next();
 		}
-
-		// TODOS : demande à user s'il veut ajouter une autre formation
 	}
 
 	public static void displayCart(HashMap<Integer, ArrayList<String>> cart) {
