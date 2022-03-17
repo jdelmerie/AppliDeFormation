@@ -16,14 +16,14 @@ public class Formation {
 		System.out.println("Bonjour et bienvenue dans l'application FullTraining");
 		HashMap<Integer, ArrayList<String>> training = List.training(); // récup la liste des formations
 		HashMap<Integer, Integer> cart = new HashMap<Integer, Integer>(); // panier de l'utilisateur (ID DE LA FORMATION
-																			// / QUANTITY)
+															// / QUANTITY)
 
 		boolean displayChoice = false;
 		int choiceMenu;
 
 		do {
 			displayMenu(); // affiche le menu principal
-
+			System.out.println(cart);	
 			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
 				scanner.next();
 			choiceMenu = scanner.nextInt(); // récup le choix du menu
@@ -42,8 +42,7 @@ public class Formation {
 				displayChoice = true;
 				break;
 			case 4: // supprimer des trucs du panier
-//				delete(training, cart);
-				System.out.println("Supprimer une formation du panier");
+				delete(training, cart);
 				displayChoice = true;
 				break;
 			case 5: // sortir de l'application
@@ -56,24 +55,26 @@ public class Formation {
 			}
 		} while (displayChoice);
 		scanner.close();
+;
 	}
 
 	/**
 	 * Cette méthode permet d'afficher la liste des formations
 	 * 
-	 * @param training - Liste des formations proposées par 
-	 *                 l'application
+	 * @param training - Liste des formations proposées par l'application
 	 */
 	public static void displayTraining(HashMap<Integer, ArrayList<String>> training) {
 		String format = "%-2s | %-15s | %-8s | %-35s |%-10s";
 		String hr = "-----------------------------------------------------------------------------";
 		System.out.println(hr);
-		System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX");System.out.println();
+		System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX");
+		System.out.println();
 		System.out.println(hr);
 
 		for (HashMap.Entry<Integer, ArrayList<String>> tr : training.entrySet()) {
-			System.out.format(format, tr.getKey(), tr.getValue().get(0), tr.getValue().get(1),
-					tr.getValue().get(2), tr.getValue().get(3));System.out.println();
+			System.out.format(format, tr.getKey(), tr.getValue().get(0), tr.getValue().get(1), tr.getValue().get(2),
+					tr.getValue().get(3));
+			System.out.println();
 		}
 		System.out.println(hr);
 	}
@@ -102,7 +103,6 @@ public class Formation {
 		displayTraining(training);
 		System.out.println("Souhaitez-vous ajouter une formation à votre panier ? [Oui/Non]");
 		String str = scanner.next();
-		System.out.println(cart);
 		while (str.equalsIgnoreCase("oui") || str.equalsIgnoreCase("o")) {
 			System.out.println("Quelle formation souhaitez-vous acheter ? [Saisir l'ID de la formation]");
 			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
@@ -118,40 +118,62 @@ public class Formation {
 				cart.put(id, qty);
 				System.out.println("La formation " + training.get(id).get(0) + " a bien été ajouté au panier.");
 			} else {
-				System.out.println("Cette formation n'exite pas dans la liste");
+				System.out.println("Cette formation n'excite pas dans la liste");
 			}
 			System.out.println("Souhaitez-vous ajouter une autre formation ? [Oui/Non]");
 			str = scanner.next();
 		}
 	}
 
-	public static void delete(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, ArrayList<String>> cart) {
-		System.out.println("Quelle formation souhaitez-vous supprimer du panier ? [Saisir l'ID de la formation]");
-		int id = scanner.nextInt();// récup le choix de l'user
-		if (training.get(id) != null) { // si formation existe
-			cart.remove(id); // supp du panier
+	/**
+	 * Permet de supprimer une formation du panier
+	 * @param training
+	 * @param cart
+	 */
+	public static void delete(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, Integer> cart) {
+		if (cart.size() > 0) {
+			System.out.println("Quelle formation souhaitez-vous supprimer du panier ? [Saisir l'ID de la formation]");
+			displayCart(training, cart);
+			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
+				scanner.next();
+			int id = scanner.nextInt();// récup le choix de l'user
+			if (cart.get(id) != null) { // si formation existe
+				cart.put(id, cart.get(id) - 1); // supp une formation
+				if(cart.get(id) == 0) { //si qté est à 0
+					cart.remove(id); // supp du panier
+				}
+				System.out.println("La formation a bien été supprimée.");
+				
+			} else {
+				System.out.println("Cette formation ne figure pas dans votre panier.");
+			}
+		} else {
+			System.out.println("Votre panier est vide.");
 		}
 	}
 
 	/**
-	 * Affiche le contenu du panier 
+	 * Affiche le contenu du panier
+	 * 
 	 * @param training
 	 * @param cart
 	 */
 	public static void displayCart(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, Integer> cart) {
 
-		if (!cart.isEmpty()) { //si le panier contient des formations
+		if (!cart.isEmpty()) { // si le panier contient des formations
 			String format = "%-2s | %-15s | %-8s | %-35s |%-8s |%-8s";
 			String hr = "-------------------------------------------------------------------------------------------";
-			System.out.println("Contenu actuel de votre panier");System.out.println();
-			System.out.println(hr);System.out.println();
+			System.out.println("Contenu actuel de votre panier");
+			System.out.println(hr);
 			System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX", "QUANTITE");
+			System.out.println();
 			System.out.println(hr);
 			for (HashMap.Entry<Integer, ArrayList<String>> tr : training.entrySet()) {
 				for (HashMap.Entry<Integer, Integer> c : cart.entrySet()) {
 					if (tr.getKey() == c.getKey()) {
 						System.out.format(format, tr.getKey(), tr.getValue().get(0), tr.getValue().get(1),
-								tr.getValue().get(2), tr.getValue().get(3), c.getValue());System.out.println();
+								tr.getValue().get(2), tr.getValue().get(3), c.getValue());
+						System.out.println();
 					}
 				}
 			}
