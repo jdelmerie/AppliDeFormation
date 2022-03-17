@@ -15,7 +15,8 @@ public class Formation {
 	public static void main(String[] args) {
 		System.out.println("Bonjour et bienvenue dans l'application FullTraining");
 		HashMap<Integer, ArrayList<String>> training = List.training(); // récup la liste des formations
-		HashMap<Integer, Integer> cart = new HashMap<Integer, Integer>();  // panier de l'utilisateur (ID DE LA FORMATION / QUANTITY)
+		HashMap<Integer, Integer> cart = new HashMap<Integer, Integer>(); // panier de l'utilisateur (ID DE LA FORMATION
+																			// / QUANTITY)
 
 		boolean displayChoice = false;
 		int choiceMenu;
@@ -23,6 +24,8 @@ public class Formation {
 		do {
 			displayMenu(); // affiche le menu principal
 
+			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
+				scanner.next();
 			choiceMenu = scanner.nextInt(); // récup le choix du menu
 
 			switch (choiceMenu) {
@@ -36,7 +39,6 @@ public class Formation {
 				break;
 			case 3: // afficher le panier
 				displayCart(training, cart);
-				System.out.println("Afficher le panier");
 				displayChoice = true;
 				break;
 			case 4: // supprimer des trucs du panier
@@ -45,8 +47,12 @@ public class Formation {
 				displayChoice = true;
 				break;
 			case 5: // sortir de l'application
-				System.out.println("5 - Quitter l'application");
+				System.out.println("Vous avez quitté l'application, à bientôt !");
+				displayChoice = false;
 				break;
+			default:
+				System.out.println("Mauvaise saisie, recommencez");
+				displayChoice = true;
 			}
 		} while (displayChoice);
 		scanner.close();
@@ -55,24 +61,21 @@ public class Formation {
 	/**
 	 * Cette méthode permet d'afficher la liste des formations
 	 * 
-	 * @param training - Hashmap contenant la liste des formations proposées par
+	 * @param training - Liste des formations proposées par 
 	 *                 l'application
 	 */
 	public static void displayTraining(HashMap<Integer, ArrayList<String>> training) {
 		String format = "%-2s | %-15s | %-8s | %-35s |%-10s";
-		System.out.println("Nous allons vous proposer une liste de formation actuellement disponible");
-		System.out.println();
-		System.out.println("----------------------------------------------------------------------------");
-		System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX");
-		System.out.println();
-		System.out.println("----------------------------------------------------------------------------");
+		String hr = "-----------------------------------------------------------------------------";
+		System.out.println(hr);
+		System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX");System.out.println();
+		System.out.println(hr);
 
-		for (int i = 1; i < training.size() + 1; i++) {
-			System.out.format(format, i, training.get(i).get(0), training.get(i).get(1), training.get(i).get(2),
-					training.get(i).get(3));
-			System.out.println();
+		for (HashMap.Entry<Integer, ArrayList<String>> tr : training.entrySet()) {
+			System.out.format(format, tr.getKey(), tr.getValue().get(0), tr.getValue().get(1),
+					tr.getValue().get(2), tr.getValue().get(3));System.out.println();
 		}
-		System.out.println("----------------------------------------------------------------------------");
+		System.out.println(hr);
 	}
 
 	/**
@@ -93,7 +96,7 @@ public class Formation {
 	 * Permet d'ajouter une formation au panier de l'utilisateur
 	 * 
 	 * @param training - Liste des formations proposées
-	 * @param cart     - Panier à remplir
+	 * @param cart     - Panier à remplir (ID de la formation / Quantité)
 	 */
 	public static void add(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, Integer> cart) {
 		displayTraining(training);
@@ -102,15 +105,20 @@ public class Formation {
 		System.out.println(cart);
 		while (str.equalsIgnoreCase("oui") || str.equalsIgnoreCase("o")) {
 			System.out.println("Quelle formation souhaitez-vous acheter ? [Saisir l'ID de la formation]");
+			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
+				scanner.next();
 			int id = scanner.nextInt();// récup le choix de l'user
 			if (training.get(id) != null) { // si formation existe
-				int qty = 0;
-				if (cart.containsKey(id)) {
+				int qty = 0; // qté de base
+				if (cart.containsKey(id)) { // si formation existe dans le panier +1
 					qty = cart.get(id) + 1;
 				} else {
 					qty += 1;
 				}
-				cart.put(id, qty); 
+				cart.put(id, qty);
+				System.out.println("La formation " + training.get(id).get(0) + " a bien été ajouté au panier.");
+			} else {
+				System.out.println("Cette formation n'exite pas dans la liste");
 			}
 			System.out.println("Souhaitez-vous ajouter une autre formation ? [Oui/Non]");
 			str = scanner.next();
@@ -125,37 +133,32 @@ public class Formation {
 		}
 	}
 
+	/**
+	 * Affiche le contenu du panier 
+	 * @param training
+	 * @param cart
+	 */
 	public static void displayCart(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, Integer> cart) {
 
-		
-		if (!cart.isEmpty()) {
-			System.out.println("Contenu actuel de votre panier");
+		if (!cart.isEmpty()) { //si le panier contient des formations
+			String format = "%-2s | %-15s | %-8s | %-35s |%-8s |%-8s";
+			String hr = "-------------------------------------------------------------------------------------------";
+			System.out.println("Contenu actuel de votre panier");System.out.println();
+			System.out.println(hr);System.out.println();
+			System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX", "QUANTITE");
+			System.out.println(hr);
 			for (HashMap.Entry<Integer, ArrayList<String>> tr : training.entrySet()) {
 				for (HashMap.Entry<Integer, Integer> c : cart.entrySet()) {
-					if(tr.getKey() == c.getKey()) {
-						System.out.println("ID : " + tr.getKey() + " | " + String.join(" | ", tr.getValue()) + " | Quantité : " + c.getValue());
+					if (tr.getKey() == c.getKey()) {
+						System.out.format(format, tr.getKey(), tr.getValue().get(0), tr.getValue().get(1),
+								tr.getValue().get(2), tr.getValue().get(3), c.getValue());System.out.println();
 					}
 				}
 			}
-			
-//			String format = "%-2s | %-15s | %-8s | %-35s |%-10s |%-10s";
-//			System.out.println("Contenu actuel de votre panier");
-//			System.out.println();
-//			System.out.println("----------------------------------------------------------------------------");
-//			System.out.format(format, "ID", "COURS", "NB/JOURS", "DESCRIPTION", "PRIX", "QUANTITE");
-//			System.out.println();
-//			System.out.println("----------------------------------------------------------------------------");
-//
-//			for (int i = 1; i < cart.size() + 1; i++) {
-//				System.out.format(format, i, cart.get(i).get(0), cart.get(i).get(1), cart.get(i).get(2),
-//						cart.get(i).get(3));
-//				System.out.println();
-//			}
-//			System.out.println("----------------------------------------------------------------------------");
+			System.out.println(hr);
 		} else {
 			System.out.println("Votre panier est vide pour l'instant.");
 		}
-
 	}
 
 }
