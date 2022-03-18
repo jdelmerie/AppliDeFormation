@@ -22,7 +22,6 @@ public class Formation {
 		int choiceMenu;
 
 		do {
-			System.out.println(cart);
 			displayMenu(); // affiche le menu principal
 			while (scanner.hasNextInt() == false) // ignore la saisie tant qu'il ne s'agit pas d'un entier
 				scanner.next();
@@ -47,16 +46,17 @@ public class Formation {
 				break;
 			case 5: // passer commande
 				if (!cart.isEmpty()) {
-					commande(training, cart);
+					commande(training, cart); // affiche "l'écran secondaire" avec le panier et le total
 					displayChoice = false;
-					validation(cart, displayChoice);
+					validation(cart); // demande confirmation à l'user pour validation du panier ou non
+					displayChoice = true;
 				} else {
 					System.out.println("Votre panier est vide pour l'instant.");
 					displayChoice = true;
 				}
 				break;
 			case 6: // sortir de l'application
-				System.out.println("Vous avez quitté l'application, à bientôt !");
+				System.out.println("Vous avez déconnecté, à bientôt !");
 				displayChoice = false;
 				break;
 			default:
@@ -120,15 +120,19 @@ public class Formation {
 			int id = scanner.nextInt();// récup le choix de l'user
 			if (training.get(id) != null) { // si formation existe
 				int qty = 0; // qté de base
-				if (cart.containsKey(id)) { // si formation existe dans le panier +1
-					qty = cart.get(id) + 1;
+				if(training.get(id).get(4).equalsIgnoreCase("disponible")) { // si la formation est dispo je peux l'ajouter au panier
+					if (cart.containsKey(id)) { // si formation existe dans le panier + 1
+						qty = cart.get(id) + 1;
+					} else {
+						qty += 1;
+					}
+					cart.put(id, qty);
+					System.out.println("La formation " + training.get(id).get(0) + " a bien été ajouté au panier.");
 				} else {
-					qty += 1;
+					System.out.println("Cette formation sera prochainement disponible.");
 				}
-				cart.put(id, qty);
-				System.out.println("La formation " + training.get(id).get(0) + " a bien été ajouté au panier.");
 			} else {
-				System.out.println("Cette formation n'excite pas dans la liste");
+				System.out.println("Cette formation n'existe pas dans la liste");
 			}
 			System.out.println("Souhaitez-vous ajouter une autre formation ? [Oui/Non]");
 			str = scanner.next();
@@ -155,7 +159,6 @@ public class Formation {
 					cart.remove(id); // supp du panier
 				}
 				System.out.println("La formation a bien été supprimée.");
-
 			} else {
 				System.out.println("Cette formation ne figure pas dans votre panier.");
 			}
@@ -197,7 +200,7 @@ public class Formation {
 
 	public static void commande(HashMap<Integer, ArrayList<String>> training, HashMap<Integer, Integer> cart) {
 		System.out.println();
-		System.out.println("****************PAGE COMMANADE**************** \n");
+		System.out.println("****************VOTRE COMMANADE**************** \n");
 
 		String format = "%-2s | %-15s | %-8s | %-35s |%-8s |%-8s";
 		String hr = "-------------------------------------------------------------------------------------------";
@@ -217,22 +220,21 @@ public class Formation {
 			}
 		}
 		System.out.println(hr);
-		System.out.format("TOTAL DU PANI ER : " + total + " € \n");
+		System.out.format("TOTAL DU PANIER : " + total + " € \n");
 	}
 	
-	public static void validation(HashMap<Integer, Integer> cart, boolean displayChoice) {
+	public static void validation(HashMap<Integer, Integer> cart) {
 		String str;
 
 		do {
 			System.out.println("Souhaitez-vous valider votre panier ? [Oui/Non]");
 			str = scanner.next();
 		} while (!str.equalsIgnoreCase("oui") && !str.equalsIgnoreCase("non"));
-		if (str.equalsIgnoreCase("oui")) {
+		if (str.equalsIgnoreCase("oui") || str.equalsIgnoreCase("o")) {
 			System.out.println("Votre commande a bien été validé.");
 			cart.clear();
-			displayChoice = true;
 		} else {
-			System.out.println("Opération annulée. Retour au menu principal");  
+			System.out.println("Opération annulée.");  
 		}
 	}
 
